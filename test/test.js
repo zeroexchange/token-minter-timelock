@@ -6,6 +6,7 @@ const { expect } = require('chai');
 
 const TestTransferer = artifacts.require('TestTransferer');
 const MockToken = artifacts.require('MockToken');
+const ZERO = artifacts.require('ZERO');
 
 const addr = [];
 before(async() => {
@@ -17,8 +18,8 @@ before(async() => {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-it('works', async () => {
-    const token = await MockToken.new(addr.sender);
+it(`works with real token`, async () => {
+    const token = await ZERO.new(addr.sender);
     const transferer = await TestTransferer.new(token.address, addr.futureMinter);
     await token.changeMinter(transferer.address);
 
@@ -26,12 +27,41 @@ it('works', async () => {
 
     await truffleAssert.reverts(transferer.changeMinter());
 
-    await sleep(30000);
+    await sleep(4000);
+    // we waited some time, but not enough
+    await truffleAssert.reverts(transferer.changeMinter());
 
+    await sleep(1000);
+
+    // now it must work
     await transferer.changeMinter();
 
     truffleAssert.eventEmitted(
         await token.mint(addr.sender, 1000, { from: addr.futureMinter }),
-        'Minted'
+        'Transfer'
     );
 });
+
+// it('works', async () => {
+//     const token = await MockToken.new(addr.sender);
+//     const transferer = await TestTransferer.new(token.address, addr.futureMinter);
+//     await token.changeMinter(transferer.address);
+
+//     await truffleAssert.reverts(token.changeMinter(addr.sender))
+
+//     await truffleAssert.reverts(transferer.changeMinter());
+
+//     await sleep(4000);
+//     // we waited some time, but not enough
+//     await truffleAssert.reverts(transferer.changeMinter());
+
+//     await sleep(1000);
+
+//     // now it must work
+//     await transferer.changeMinter();
+
+//     truffleAssert.eventEmitted(
+//         await token.mint(addr.sender, 1000, { from: addr.futureMinter }),
+//         'Minted'
+//     );
+// });

@@ -4,7 +4,7 @@ const stuffToReplace = [
     { 
         inFile: "Transferer.sol", 
         replace: "uint constant TIME_DELAY = 30 days;", 
-        with: "uint constant TIME_DELAY = 30 seconds;" 
+        with: "uint constant TIME_DELAY = 5 seconds;",
     },
     {
         inFile: "Transferer.sol", 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6 <0.9.0;
+pragma solidity 0.5.17;
 
 import "./TokenInterface.sol";
 
@@ -18,7 +18,7 @@ contract MockToken is IZERO {
         _;
     }
 
-    function changeMinter(address newMinter) external override onlyMinter {
+    function changeMinter(address newMinter) external onlyMinter {
         _changeMinter(newMinter);
     }
 
@@ -27,7 +27,7 @@ contract MockToken is IZERO {
         emit ChangeMinter(newMinter);
     }
 
-    function mint(address to, uint256 value) external override onlyMinter returns (bool) {
+    function mint(address to, uint256 value) external onlyMinter returns (bool) {
         emit Minted(to, value);
         return true;
     }
