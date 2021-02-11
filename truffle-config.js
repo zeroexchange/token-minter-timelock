@@ -72,6 +72,26 @@ module.exports = {
     // network_id: 2111,   // This network is yours, in the cloud.
     // production: true    // Treats this network as if it was a public net. (default: false)
     // }
+    rinkeby: {
+      provider: () => new HDWalletProvider(
+        process.env.RINKEBY_PRIVATE_KEY, 
+        `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`
+      ),
+      network_id: 4,
+      gas: 5500000,
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+    },
+    main: {
+      provider: () => new HDWalletProvider(
+        process.env.MAINNET_PRIVATE_KEY,
+        `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`
+      ),
+      network_id: 1,
+      gas: 12000000,
+      gasPrice: 10000000000
+    }
   },
 
   // Set default mocha options here, use special reporters etc.
@@ -85,10 +105,10 @@ module.exports = {
       version: "0.5.17",    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
-      //  optimizer: {
-      //    enabled: false,
-      //    runs: 200
-      //  },
+       optimizer: {
+         enabled: true,
+         runs: 200
+       },
       //  evmVersion: "byzantium"
       // }
     }

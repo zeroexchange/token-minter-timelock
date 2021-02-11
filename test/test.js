@@ -18,20 +18,35 @@ before(async() => {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+class Sleeper {
+    constructor() {
+        this.started = Date.now();
+    }
+
+    async sleepUntil(ms) {
+        const alreadySleeped = Date.now() - this.started;
+        const toSleep = ms - alreadySleeped;
+        if (toSleep > 0)
+            await sleep(toSleep)
+    }
+}
+
 it(`works with real token`, async () => {
     const token = await ZERO.new(addr.sender);
     const transferer = await TestTransferer.new(token.address, addr.futureMinter);
+    const sleeper = new Sleeper();
     await token.changeMinter(transferer.address);
 
     await truffleAssert.reverts(token.changeMinter(addr.sender))
 
     await truffleAssert.reverts(transferer.changeMinter());
 
-    await sleep(4000);
+    await sleeper.sleepUntil(4000);
     // we waited some time, but not enough
     await truffleAssert.reverts(transferer.changeMinter());
-
-    await sleep(1000);
+    await truffleAssert.reverts(token.mint(addr.sender, 1000, { from: addr.futureMinter }));
+    
+    await sleeper.sleepUntil(5000);
 
     // now it must work
     await transferer.changeMinter();
@@ -42,26 +57,28 @@ it(`works with real token`, async () => {
     );
 });
 
-// it('works', async () => {
-//     const token = await MockToken.new(addr.sender);
-//     const transferer = await TestTransferer.new(token.address, addr.futureMinter);
-//     await token.changeMinter(transferer.address);
+it('works with mock token', async () => {
+    const token = await MockToken.new(addr.sender);
+    const transferer = await TestTransferer.new(token.address, addr.futureMinter);
+    const sleeper = new Sleeper();
+    await token.changeMinter(transferer.address);
 
-//     await truffleAssert.reverts(token.changeMinter(addr.sender))
+    await truffleAssert.reverts(token.changeMinter(addr.sender))
 
-//     await truffleAssert.reverts(transferer.changeMinter());
+    await truffleAssert.reverts(transferer.changeMinter());
 
-//     await sleep(4000);
-//     // we waited some time, but not enough
-//     await truffleAssert.reverts(transferer.changeMinter());
+    await sleeper.sleepUntil(4000);
+    // we waited some time, but not enough
+    await truffleAssert.reverts(transferer.changeMinter());
+    await truffleAssert.reverts(token.mint(addr.sender, 1000, { from: addr.futureMinter }));
+    
+    await sleeper.sleepUntil(5000);
 
-//     await sleep(1000);
+    // now it must work
+    await transferer.changeMinter();
 
-//     // now it must work
-//     await transferer.changeMinter();
-
-//     truffleAssert.eventEmitted(
-//         await token.mint(addr.sender, 1000, { from: addr.futureMinter }),
-//         'Minted'
-//     );
-// });
+    truffleAssert.eventEmitted(
+        await token.mint(addr.sender, 1000, { from: addr.futureMinter }),
+        'Minted'
+    );
+});
