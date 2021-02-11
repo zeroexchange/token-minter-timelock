@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "test": "yarn prepare-test-contracts && truffle test",
+    "prepare-test-contracts": "node scripts/prepare-test-contracts.js",
+    "dev:ganache": "ganache-cli --gasLimit 6721975 --gasPrice 20000000000 -e 10000000 -p 7545 > node.log"
+  },
+  "devDependencies": {
+    "chai": "^4.3.0",
+    "dotenv": "^8.2.0",
+    "ganache-cli": "^6.12.2",
+    "mocha": "^8.2.1",
+    "truffle": "^5.1.65",
+    "truffle-assertions": "^0.9.2",
+    "web3": "^1.3.4"
+  }
+}
